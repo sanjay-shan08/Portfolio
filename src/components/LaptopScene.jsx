@@ -4,8 +4,6 @@ import { useScroll, RoundedBox, Text, Svg, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDive } from '../contexts/DiveContext';
 
-// MatrixRain component removed as requested
-
 const cardColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 
 const projectData = [
@@ -48,7 +46,6 @@ const ProjectsContent3D = ({ onProjectClick }) => {
       const isHovered = hoveredIndex === i;
       const targetWidth = isHovered ? 2.0 : 0.4;
 
-      // Animate the logical width of the card
       card.currentWidth = THREE.MathUtils.damp(card.currentWidth || targetWidth, targetWidth, 6, delta);
 
       const targetX = currentX + (card.currentWidth / 2);
@@ -60,13 +57,12 @@ const ProjectsContent3D = ({ onProjectClick }) => {
 
       if (card.content) {
         card.content.position.x = targetX;
-        
-        // Stricter opacity curve so content hides faster when compressed
+
         const opacity = THREE.MathUtils.clamp((card.currentWidth - 1.2) / 0.8, 0, 1);
-        
+
         card.content.traverse((child) => {
           if (child.isMesh && child.material) {
-            // Apply opacity to all materials (including nested ones like RoundedBox)
+
             child.material.transparent = true;
             child.material.opacity = opacity;
             child.visible = opacity > 0;
@@ -84,7 +80,6 @@ const ProjectsContent3D = ({ onProjectClick }) => {
         FEATURED WORKS
       </Text>
 
-      {/* Horizontal Accordion Gallery */}
       <group position={[0, 0, 0]}>
         {projectData.map((project, i) => {
           return (
@@ -93,10 +88,10 @@ const ProjectsContent3D = ({ onProjectClick }) => {
               ref={(el) => { if (el) cardsRef.current[i] = el; }}
               onPointerOver={(e) => { e.stopPropagation(); setHoveredIndex(i); }}
             >
-              {/* Scalable Background */}
+
               <group ref={(el) => { if (cardsRef.current[i]) cardsRef.current[i].bg = el }}>
                 <RoundedBox args={[1, 1.2, 0.02]} radius={0.03} smoothness={4}>
-                  {/* Premium Glassmorphism Material */}
+
                   <meshPhysicalMaterial
                     color={cardColors[i]}
                     transmission={0.8}
@@ -112,7 +107,6 @@ const ProjectsContent3D = ({ onProjectClick }) => {
                 </RoundedBox>
               </group>
 
-              {/* Non-scaling Content */}
               <group ref={(el) => { if (cardsRef.current[i]) cardsRef.current[i].content = el }}>
                 <Text font="/Orbitron.ttf" position={[0, 0.35, 0.012]} fontSize={0.14} color="#ffffff" anchorX="center" fontWeight="bold">
                   {project.title}
@@ -220,18 +214,18 @@ const ExperienceContent3D = () => {
       <Text font="/Orbitron.ttf" position={[0, 0.8, 0]} fontSize={0.18} color="#ffffff" anchorX="center" fontWeight={600} letterSpacing={0.05}>
         EXPERIENCE
       </Text>
-      
+
       <group position={[0, 0, 0]}>
         {experienceData.map((exp, i) => {
           return (
-            <group 
-              key={i} 
+            <group
+              key={i}
               ref={(el) => { if (el) cardsRef.current[i] = el; }}
               onPointerOver={(e) => { e.stopPropagation(); setHoveredIndex(i); }}
             >
               <group ref={(el) => { if (cardsRef.current[i]) cardsRef.current[i].bg = el }}>
                 <RoundedBox args={[1, 1.2, 0.02]} radius={0.03} smoothness={4}>
-                  <meshPhysicalMaterial 
+                  <meshPhysicalMaterial
                     color={cardColors[i]}
                     transmission={0.8}
                     transparent={true}
@@ -245,16 +239,16 @@ const ExperienceContent3D = () => {
                   />
                 </RoundedBox>
               </group>
-              
+
               <group ref={(el) => { if (cardsRef.current[i]) cardsRef.current[i].content = el }}>
                 <Text font="/Orbitron.ttf" position={[0, 0.35, 0.012]} fontSize={0.14} color="#ffffff" anchorX="center" fontWeight="bold">
                   {exp.company}
                 </Text>
-                
+
                 <Text font="/Orbitron.ttf" position={[0, 0.1, 0.012]} fontSize={0.08} color="#eeeeee" anchorX="center" maxWidth={1.8} textAlign="center">
                   {exp.role}
                 </Text>
-                
+
                 <Text font="/Orbitron.ttf" position={[0, -0.1, 0.012]} fontSize={0.06} color="#aaaaaa" anchorX="center" maxWidth={1.8} textAlign="center">
                   {exp.date}
                 </Text>
@@ -277,20 +271,18 @@ const ExperienceContent3D = () => {
 };
 
 const ScreenContentRenderer = ({ onProjectClick }) => {
-  const [view, setView] = useState('projects'); 
+  const [view, setView] = useState('projects');
   const projRef = useRef();
   const expRef = useRef();
 
   useFrame((state, delta) => {
     if (!projRef.current || !expRef.current) return;
-    
-    // Projects slide left (-2) and shrink to 0 when hidden
+
     const targetProjX = view === 'projects' ? 0 : -2;
     const targetProjS = view === 'projects' ? 1 : 0;
     projRef.current.position.x = THREE.MathUtils.damp(projRef.current.position.x, targetProjX, 6, delta);
     projRef.current.scale.setScalar(THREE.MathUtils.damp(projRef.current.scale.x, targetProjS, 6, delta));
-    
-    // Experience slides right (2) and shrinks to 0 when hidden
+
     const targetExpX = view === 'experience' ? 0 : 2;
     const targetExpS = view === 'experience' ? 1 : 0;
     expRef.current.position.x = THREE.MathUtils.damp(expRef.current.position.x, targetExpX, 6, delta);
@@ -299,8 +291,8 @@ const ScreenContentRenderer = ({ onProjectClick }) => {
 
   return (
     <group>
-      {/* UI Tab / Button on Screen to toggle */}
-      <group 
+
+      <group
         position={[0, 2.55, 0.02]}
         onClick={(e) => { e.stopPropagation(); setView(v => v === 'projects' ? 'experience' : 'projects') }}
         onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer' }}
@@ -318,7 +310,7 @@ const ScreenContentRenderer = ({ onProjectClick }) => {
         <group ref={projRef}>
           <ProjectsContent3D onProjectClick={onProjectClick} />
         </group>
-        
+
         <group ref={expRef}>
           <ExperienceContent3D />
         </group>
@@ -333,7 +325,6 @@ const KeyboardKeys = () => {
   const iconGroupsRef = useRef([]);
   const scroll = useScroll();
 
-  // Mac-like keyboard layout proportions
   const layout = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5],
@@ -361,29 +352,28 @@ const KeyboardKeys = () => {
     const keyDepth = 0.18;
     const baseKeyWidth = 0.21;
     const gap = 0.03;
-    const startZ = -0.74; // Position perfectly over the black keyboard bed
+    const startZ = -0.74;
 
     const foundIcons = [];
 
     layout.forEach((row, rowIndex) => {
-      // Calculate a strict uniform row width based on the top row (14 keys, 13 gaps)
-      const TOTAL_WIDTH = 14 * baseKeyWidth + 13 * gap; 
-      
+
+      const TOTAL_WIDTH = 14 * baseKeyWidth + 13 * gap;
+
       const rawKeysWidth = row.reduce((acc, w) => acc + (w * baseKeyWidth), 0);
       const targetKeysWidth = TOTAL_WIDTH - ((row.length - 1) * gap);
-      const scaleFactor = targetKeysWidth / rawKeysWidth; // Stretch keys slightly to perfectly fill the row
+      const scaleFactor = targetKeysWidth / rawKeysWidth;
 
       let startX = -TOTAL_WIDTH / 2;
       const z = startZ + rowIndex * (keyDepth + gap);
 
       row.forEach((keyWidthFactor, colIndex) => {
         const w = (keyWidthFactor * baseKeyWidth) * scaleFactor;
-        dummy.position.set(startX + w / 2, 0.005, z); // Slightly above the bed
+        dummy.position.set(startX + w / 2, 0.005, z);
         dummy.scale.set(w, 0.015, keyDepth);
         dummy.updateMatrix();
         meshRef.current.setMatrixAt(i++, dummy.matrix);
 
-        // Check if this key is one of our target icon keys
         const targetIcon = iconData.find(d => d.row === rowIndex && d.col === colIndex);
         if (targetIcon) {
           foundIcons.push({ ...targetIcon, x: startX + w / 2, y: 0.015, z: z });
@@ -402,27 +392,22 @@ const KeyboardKeys = () => {
     iconGroupsRef.current.forEach((group, i) => {
       if (!group || !iconPositions[i]) return;
 
-      // Stagger the trigger threshold based on index (0.82, 0.84, 0.86, 0.88)
       const triggerThreshold = 0.82 + (i * 0.02);
       const isActive = scroll.offset > triggerThreshold;
       const t = state.clock.elapsedTime;
 
-      // 1. Scale Animation (Elastic pop)
       const baseTargetScale = isActive ? 1 : 0;
       let finalScale = THREE.MathUtils.damp(group.scale.x, baseTargetScale, 8, delta);
 
-      // 2. Continuous Pulse when fully active
       if (isActive && finalScale > 0.95) {
         const pulse = Math.sin(t * 4 + i) * 0.05;
         finalScale = 1 + pulse;
       }
       group.scale.setScalar(finalScale);
 
-      // 3. Float Animation (Lift off the keyboard)
       const targetY = isActive ? iconPositions[i].y + 0.015 : iconPositions[i].y;
       group.position.y = THREE.MathUtils.damp(group.position.y, targetY, 6, delta);
 
-      // 4. Mechanical Flip Animation
       const targetRotX = isActive ? 0 : Math.PI;
       group.rotation.x = THREE.MathUtils.damp(group.rotation.x, targetRotX, 8, delta);
     });
@@ -455,18 +440,17 @@ const KeyboardKeys = () => {
             document.body.style.cursor = 'auto';
           }}
         >
-          {/* Physical glowing 3D keycap */}
+
           <mesh position={[0, -0.002, 0]}>
             <boxGeometry args={[0.19, 0.002, 0.16]} />
             <meshBasicMaterial color={icon.color} />
           </mesh>
 
-          {/* Native 3D Text Overlay or SVG Icon */}
           {icon.iconUrl ? (
             <Center position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <Svg 
-                src={icon.iconUrl} 
-                scale={0.0035} 
+              <Svg
+                src={icon.iconUrl}
+                scale={0.0035}
                 fillMaterial={{ color: icon.label === 'gh' ? '#000000' : '#ffffff' }}
               />
             </Center>
@@ -496,10 +480,9 @@ const LetsConnectText = () => {
 
   useFrame((state, delta) => {
     if (!scroll || !textGroupRef.current) return;
-    // Activate only when scrolled down 80% (just as keys pop up)
+
     const isActive = scroll.offset > 0.8;
-    
-    // Animate scale to pop up smoothly
+
     const targetScale = isActive ? 1 : 0;
     textGroupRef.current.scale.setScalar(THREE.MathUtils.damp(textGroupRef.current.scale.x, targetScale, 6, delta));
   });
@@ -525,58 +508,44 @@ export default function LaptopScene() {
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
-    // --- OVERRIDE: Dive Into Screen Logic ---
     if (diveTarget !== null) {
-      // Cinematic Pull In (damp factor 2 for slow, cinematic feel)
+
       groupRef.current.position.x = THREE.MathUtils.damp(groupRef.current.position.x, 0, 2, delta);
       groupRef.current.position.y = THREE.MathUtils.damp(groupRef.current.position.y, -1.35, 2, delta);
       groupRef.current.position.z = THREE.MathUtils.damp(groupRef.current.position.z, 8.2, 2, delta);
 
-      // Flatten rotations perfectly so screen faces camera
       groupRef.current.rotation.x = THREE.MathUtils.damp(groupRef.current.rotation.x, 0, 2, delta);
       groupRef.current.rotation.y = THREE.MathUtils.damp(groupRef.current.rotation.y, 0, 2, delta);
       groupRef.current.rotation.z = THREE.MathUtils.damp(groupRef.current.rotation.z, 0, 2, delta);
 
-      // Ensure lid is open exactly straight up (0)
       if (screenRef.current) {
         screenRef.current.rotation.x = THREE.MathUtils.damp(screenRef.current.rotation.x, 0, 2, delta);
       }
-      return; // Skip standard scroll physics
+      return;
     }
 
-    // --- STANDARD SCROLL TIMELINE ---
-    // 1. Entrance Morph (0 to 0.2)
     const r1 = scroll.range(0, 0.2);
     groupRef.current.scale.set(r1, r1, r1);
 
-    // Laptop spins into position as it scales up
     groupRef.current.rotation.x = THREE.MathUtils.lerp(Math.PI / 2, 0, r1);
     groupRef.current.rotation.y = THREE.MathUtils.lerp(Math.PI, 0, r1);
 
-    // 2. Open Laptop Lid (0.2 to 0.35)
     const r2 = scroll.range(0.2, 0.15);
     if (screenRef.current) {
       screenRef.current.rotation.x = THREE.MathUtils.lerp(Math.PI / 2, -0.15, r2);
     }
 
-    // 3. (Removed state management for performance, HTML is always rendered)
-
-    // 4. Pull Laptop to Full Screen (0.35 to 0.6)
     const r3 = scroll.range(0.35, 0.25);
     const baseY = THREE.MathUtils.lerp(-0.5, -1.2, r3);
     const baseZ = THREE.MathUtils.lerp(0, 4.5, r3);
     const baseRotX = THREE.MathUtils.lerp(0, 0.15, r3);
 
-    // 5. Hold Full Screen (0.6 to 0.8) - no change to positions here
-
-    // 6. Tilt to Keyboard (0.8 to 0.9)
     const rTilt = scroll.range(0.8, 0.1);
     groupRef.current.rotation.x = THREE.MathUtils.lerp(baseRotX, 1.05, rTilt);
 
     const tiltY = THREE.MathUtils.lerp(baseY, -1.0, rTilt);
     const tiltZ = THREE.MathUtils.lerp(baseZ, 3.8, rTilt);
 
-    // 7. Push in / Zoom (0.9 to 1.0)
     const rZoom = scroll.range(0.9, 0.1);
     groupRef.current.position.y = THREE.MathUtils.lerp(tiltY, -0.85, rZoom);
     groupRef.current.position.z = THREE.MathUtils.lerp(tiltZ, 4.3, rZoom);
@@ -585,44 +554,35 @@ export default function LaptopScene() {
   return (
     <group ref={groupRef} position={[0, -0.5, 0]}>
 
-      {/* Sleek Laptop Base */}
       <RoundedBox args={[4.2, 0.08, 2.8]} radius={0.04} smoothness={4} position={[0, -0.04, 0]}>
         <meshStandardMaterial color="#888c94" metalness={0.9} roughness={0.15} />
       </RoundedBox>
 
-      {/* Black Keyboard Bed */}
       <mesh position={[0, 0.001, -0.2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[3.6, 1.3]} />
         <meshStandardMaterial color="#050505" roughness={0.8} />
       </mesh>
 
-      {/* 3D Keyboard Keys */}
       <KeyboardKeys />
 
-      {/* Trackpad */}
       <mesh position={[0, 0.001, 0.85]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.4, 0.7]} />
         <meshStandardMaterial color="#757880" roughness={0.3} />
       </mesh>
 
-      {/* Laptop Screen Hinge */}
       <group ref={screenRef} position={[0, 0, -1.35]}>
 
-        {/* Sleek Outer Screen Shell */}
         <RoundedBox args={[4.2, 2.7, 0.04]} radius={0.04} smoothness={4} position={[0, 1.35, -0.02]}>
           <meshStandardMaterial color="#888c94" metalness={0.9} roughness={0.15} />
         </RoundedBox>
 
-        {/* Inner Laptop Screen (Black glass) */}
         <mesh position={[0, 1.35, 0.01]}>
           <planeGeometry args={[4.1, 2.6]} />
           <meshStandardMaterial color="#000000" roughness={0.1} metalness={0.8} />
         </mesh>
 
-        {/* Screen Content Rendered natively in 3D */}
         <ScreenContentRenderer onProjectClick={handleDive} />
-        
-        {/* Animated Let's Connect Prompt */}
+
         <LetsConnectText />
 
       </group>

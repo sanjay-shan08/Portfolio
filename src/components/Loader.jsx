@@ -7,7 +7,7 @@ export default function Loader() {
 
   useEffect(() => {
     if (progress === 100) {
-      // Small delay to let the fade out animation play before removing from DOM
+
       const timer = setTimeout(() => setVisible(false), 800);
       return () => clearTimeout(timer);
     }
@@ -41,10 +41,9 @@ export default function Loader() {
         <p style={{ margin: '0 0 20px 0', color: '#666', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {item ? `Loading: ${item.split('/').pop()}` : 'Initializing core WebGL engine...'}
         </p>
-        
-        {/* Progress Bar Container */}
+
         <div style={{ width: '100%', height: '2px', backgroundColor: '#222', position: 'relative' }}>
-          {/* Progress Fill */}
+
           <div style={{
             position: 'absolute',
             top: 0,
@@ -56,7 +55,7 @@ export default function Loader() {
             boxShadow: '0 0 15px #88aaff'
           }} />
         </div>
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
           <p style={{ margin: 0, color: '#444', fontSize: '0.8rem' }}>
             {loaded} / {total || '??'} assets
